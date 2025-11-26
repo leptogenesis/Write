@@ -63,6 +63,7 @@ private:
   Button* cbSnaptoGrid;
   Button* cbLineDrawing;
   Button* cbEphemeral;
+  Button* cbLaserPointer;
   //Button* comboPressure;
   Button* comboSavePen;
   ColorEditBox* colorPicker;
@@ -81,6 +82,7 @@ private:
   SpinBox* spinDash;
   SpinBox* spinGap;
   CheckBox* cbRatio;
+  CheckBox* cbLaser;
   CheckBox* cbPrPrm;
   CheckBox* cbMaxSp;
   CheckBox* cbAngle;
