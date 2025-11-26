@@ -16,7 +16,7 @@ public:
 
   unsigned int flags;
   // existing numerical values must NOT be changed - flags is serialized to config file when saving pen
-  static constexpr unsigned int DRAW_UNDER = 0x1, SNAP_TO_GRID = 0x2, LINE_DRAWING = 0x4, EPHEMERAL = 0x8,
+  static constexpr unsigned int DRAW_UNDER = 0x1, SNAP_TO_GRID = 0x2, LINE_DRAWING = 0x4, EPHEMERAL = 0x8, LASERPOINTER=0x1000,
       WIDTH_PR = 0x10, WIDTH_SPEED = 0x20, WIDTH_DIR = 0x40, WIDTH_MASK = 0xF0, //WIDTH_LINPR = 0x80,
       TIP_FLAT = 0x100, TIP_ROUND = 0x200, TIP_CHISEL = 0x400, TIP_MASK = 0xF00;
 
