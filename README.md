@@ -29,7 +29,7 @@ To build executable `syncscribble/Release/Write`:
 
 Contributions are welcome, but please open an issue or discussion before starting on major changes.
 
-##About This Fork##
+## About This Fork ##
 I added a LASERPOINTER Option, Below Ephemeral Pen. If this is selected, when the mouse is hovering, it will show a red circling a black dot as a cursor.
 I use Write during my lecture. The laserpointer helps me to point out the actual region on Write that I am talking about. I tested it in OSX. I would be happt to
 get such a laser pointer also on the ipad.
