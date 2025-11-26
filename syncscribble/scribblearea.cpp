@@ -26,6 +26,7 @@ struct SDL_Cursor_Deleter { void operator()(void* x) { if(x) SDL_FreeCursor(stat
 std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> ScribbleArea::penCursor;
 std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> ScribbleArea::panCursor;
 std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> ScribbleArea::eraseCursor;
+std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> ScribbleArea::laserCursor;
 #endif
 
 ScribbleArea::ScribbleArea() : ScribbleView()
@@ -75,6 +76,29 @@ void ScribbleArea::loadConfig(ScribbleConfig* _cfg)
         penimg.width, penimg.height, 32, 4*penimg.width, Color::R, Color::G, Color::B, Color::A);
     penCursor.reset(SDL_CreateColorCursor(pensurf, int(penradius + 1.5), int(penradius + 1.5)));
     SDL_FreeSurface(pensurf);
+
+//************ leptogenesis ******************//
+    Image laserimg(int(2*penradius + 12), int(2*penradius + 12));
+    Painter laserpaint(Painter::PAINT_SW | Painter::NO_TEXT, &laserimg);
+    laserpaint.setBackgroundColor(Color::TRANSPARENT_COLOR);
+    laserpaint.beginFrame();
+//Draw the circle
+    laserpaint.setStrokeBrush(Color::RED);
+    laserpaint.setStrokeWidth(2);
+    laserpaint.setFillBrush(Color::TRANSPARENT_COLOR);
+    laserpaint.drawPath(Path2D().addEllipse(penradius + 6, penradius + 6, penradius+3, penradius+3));
+//Draw the center dot
+    laserpaint.setStrokeBrush(Color::BLACK);
+    laserpaint.setFillBrush(Color::BLACK);
+    laserpaint.setStrokeWidth(1);
+    laserpaint.drawPath(Path2D().addEllipse(penradius + 6, penradius + 6, penradius/2, penradius/2));
+    laserpaint.endFrame();
+    SDL_Surface* lasersurf = SDL_CreateRGBSurfaceFrom((void*)laserimg.bytes(),
+        laserimg.width, laserimg.height, 32, 4*laserimg.width, Color::R, Color::G, Color::B, Color::A);
+    laserCursor.reset(SDL_CreateColorCursor(lasersurf, int(penradius + 10), int(penradius + 10)));
+    SDL_FreeSurface(lasersurf);
+//************* leptogenesis ****************//
+
 
     Image eraserimg(int(2*eraserradius + 3), int(2*eraserradius + 3));
     Painter eraserpaint(Painter::PAINT_SW | Painter::NO_TEXT, &eraserimg);
@@ -2425,7 +2449,9 @@ void ScribbleArea::doMotionEvent(const InputEvent& event, inputevent_t eventtype
       SDL_ShowCursor(SDL_DISABLE);
     }
     else {
-      if(cursorMode == MODE_PAN)
+      if(currPen()->hasFlag(ScribblePen::LASERPOINTER))
+       SDL_SetCursor(laserCursor.get());
+      else if(cursorMode == MODE_PAN)
         SDL_SetCursor(panCursor.get());
       else if(cursorMode == MODE_STROKE)
         SDL_SetCursor(penCursor.get());
