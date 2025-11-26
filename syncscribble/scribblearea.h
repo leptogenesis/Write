@@ -234,6 +234,7 @@ protected:
   static std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> penCursor;
   static std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> panCursor;
   static std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> eraseCursor;
+  static std::unique_ptr<SDL_Cursor, SDL_Cursor_Deleter> laserCursor;
 #endif
   // some constants
   static const Dim ERASESTROKE_RADIUS;
