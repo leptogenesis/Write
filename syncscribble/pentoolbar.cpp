@@ -327,6 +327,9 @@ PenToolbar::PenToolbar() : Toolbar(widgetNode("#toolbar")), pen(Color::BLACK, 0)
   cbLineDrawing = createCheckBoxMenuItem(_("Draw Lines"));
   cbLineDrawing->onClicked = [this](){ cbLineDrawing->setChecked(!cbLineDrawing->checked()); updatePen(); };
   overflowMenu->addItem(cbLineDrawing);
+  cbLaserPointer = createCheckBoxMenuItem(_("LaserPointer"));
+  cbLaserPointer->onClicked = [this](){ cbLaserPointer->setChecked(!cbLaserPointer->checked()); updatePen(); };
+  overflowMenu->addItem(cbLaserPointer);
   cbEphemeral = createCheckBoxMenuItem(_("Ephemeral"));
   cbEphemeral->onClicked = [this](){ cbEphemeral->setChecked(!cbEphemeral->checked()); updatePen(); };
   overflowMenu->addItem(cbEphemeral);
@@ -475,6 +478,7 @@ void PenToolbar::setPen(const ScribblePen& newpen, Mode m)
   cbSnaptoGrid->setChecked(pen.hasFlag(ScribblePen::SNAP_TO_GRID));
   cbLineDrawing->setChecked(pen.hasFlag(ScribblePen::LINE_DRAWING));
   cbEphemeral->setChecked(pen.hasFlag(ScribblePen::EPHEMERAL));
+  bLaserPointer->setChecked(pen.hasFlag(ScribblePen::LASERPOINTER));
 
   // pen tip options
   penPreview->setPen(pen);
@@ -537,6 +541,7 @@ void PenToolbar::updatePen()
   pen.setFlag(ScribblePen::SNAP_TO_GRID, cbSnaptoGrid->isChecked());
   pen.setFlag(ScribblePen::LINE_DRAWING, cbLineDrawing->isChecked());
   pen.setFlag(ScribblePen::EPHEMERAL, cbEphemeral->isChecked());
+  pen.setFlag(ScribblePen::LASERPOINTER, cbLaserPointer->isChecked());
 
   int tip = comboPenTip->index();
   pen.clearAndSet(ScribblePen::TIP_MASK,
