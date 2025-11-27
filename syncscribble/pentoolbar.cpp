@@ -478,7 +478,7 @@ void PenToolbar::setPen(const ScribblePen& newpen, Mode m)
   cbSnaptoGrid->setChecked(pen.hasFlag(ScribblePen::SNAP_TO_GRID));
   cbLineDrawing->setChecked(pen.hasFlag(ScribblePen::LINE_DRAWING));
   cbEphemeral->setChecked(pen.hasFlag(ScribblePen::EPHEMERAL));
-  bLaserPointer->setChecked(pen.hasFlag(ScribblePen::LASERPOINTER));
+  cbLaserPointer->setChecked(pen.hasFlag(ScribblePen::LASERPOINTER));
 
   // pen tip options
   penPreview->setPen(pen);
