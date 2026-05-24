@@ -1,5 +1,6 @@
 package com.styluslabs.writeqt;
 
+import android.widget.RelativeLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +31,7 @@ import android.widget.Toast;
 import android.util.Log;
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 import android.content.ClipboardManager;
 import android.content.ClipDescription;
 import android.provider.Settings;
@@ -45,6 +46,7 @@ import org.libsdl.app.SDLActivity;
 
 public class MainActivity extends SDLActivity implements View.OnTouchListener, View.OnHoverListener
 {
+  private BooxOverlayView booxOverlay;
   private static native void jniInsertImage(Bitmap bitmap, String mimetype, boolean fromintent);
   private static native void jniOpenFile(String filename);
   private static native void jniOpenFileDesc(String filename, int fd);
@@ -67,7 +69,19 @@ public class MainActivity extends SDLActivity implements View.OnTouchListener, V
   @Override
   protected void onCreate(Bundle savedstate)
   {
+if (android.os.Build.VERSION.SDK_INT >= 28) {
+        org.lsposed.hiddenapibypass.HiddenApiBypass.addHiddenApiExemptions("");
+    }
     super.onCreate(savedstate);
+// Fix Z-order issue on API 23+
+//    if (android.os.Build.VERSION.SDK_INT >= 23) {
+//        getSDLSurfaceView().setZOrderOnTop(true);
+//        getSDLSurfaceView().getHolder().setFormat(
+//            android.graphics.PixelFormat.TRANSLUCENT);
+//    }
+
+android.util.Log.d("WriteDebug", "nativeLibraryDir=" + getApplicationInfo().nativeLibraryDir);
+    getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     getSDLSurfaceView().setOnTouchListener(this);
     getSDLSurfaceView().setOnHoverListener(this);
     //m_instance = this;
@@ -75,6 +89,7 @@ public class MainActivity extends SDLActivity implements View.OnTouchListener, V
     // reference: http://developer.android.com/training/sharing/receive.html
     // onNewIntent(getIntent());
     //android.util.Log.d("onCreate", "Hello!");
+    insertBooxOverlay();
   }
 
   @Override
@@ -128,7 +143,23 @@ public class MainActivity extends SDLActivity implements View.OnTouchListener, V
 //~       sendBroadcast(intent);
 //~     }
 //~   }
+@Override
+protected void onResume() {
+    super.onResume();
+    if (booxOverlay != null) booxOverlay.onResume();
+}
 
+@Override
+protected void onPause() {
+    super.onPause();
+    if (booxOverlay != null) booxOverlay.onPause();
+}
+
+@Override
+protected void onDestroy() {
+    if (booxOverlay != null) booxOverlay.onDestroy();
+    super.onDestroy();
+}
   @Override
   public boolean dispatchKeyEvent(KeyEvent event)
   {
@@ -532,6 +563,45 @@ public class MainActivity extends SDLActivity implements View.OnTouchListener, V
     if(action == MotionEvent.ACTION_UP)
       penBtnPressed = false;
   }
+
+private void insertBooxOverlay() {
+    if (mSurface == null || mLayout == null) return;
+
+	booxOverlay = new BooxOverlayView(this);
+	booxOverlay.setClickable(false);
+	booxOverlay.setFocusable(false);
+
+    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+        RelativeLayout.LayoutParams.MATCH_PARENT,
+        RelativeLayout.LayoutParams.MATCH_PARENT
+    );
+    mLayout.addView(booxOverlay, 1, params);
+
+// Log the layout hierarchy to find toolbar position
+mLayout.post(() -> {
+    for (int i = 0; i < mLayout.getChildCount(); i++) {
+        android.view.View child = mLayout.getChildAt(i);
+        android.graphics.Rect rect = new android.graphics.Rect();
+        child.getGlobalVisibleRect(rect);
+        android.util.Log.d("WriteDebug", "Child " + i + " " + 
+            child.getClass().getSimpleName() + " rect=" + rect);
+    }
+});
+
+    View surfaceView = (View) mSurface;
+    surfaceView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        @Override
+        public void onLayoutChange(View v, int left, int top, int right, int bottom,
+                                   int oldLeft, int oldTop, int oldRight, int oldBottom) {
+            float w = right - left;
+            float h = bottom - top;
+            if (w > 0 && h > 0 && booxOverlay != null) {
+                // Delay Boox init by 2 seconds to let SDL render first
+                v.postDelayed(() -> booxOverlay.init(w, h), 2000);
+            }
+        }
+    });
+}
 
   // Touch events
   @Override

@@ -1,5 +1,4 @@
 #!/bin/sh
-PATH="/home/mwhite/android-sdk/platform-tools:$PATH"
-export ANDROID_HOME="/home/mwhite/android-sdk"
+PATH="$ANDROID_HOME/platform-tools/:$PATH"
 
 ./gradlew $@

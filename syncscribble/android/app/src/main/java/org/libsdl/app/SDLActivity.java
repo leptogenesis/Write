@@ -121,7 +121,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         } else {
             library = "libmain.so";
         }
-        return getContext().getApplicationInfo().nativeLibraryDir + "/" + library;
+return getContext().getApplicationInfo().nativeLibraryDir + "/" + library;
     }
 
     /**
@@ -1510,7 +1510,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
         super(context);
         getHolder().addCallback(this);
 
-        setZOrderMediaOverlay(true);
+if (android.os.Build.VERSION.SDK_INT < 23) {
+    setZOrderMediaOverlay(true);
+}
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
