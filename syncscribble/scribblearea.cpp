@@ -252,21 +252,27 @@ void ScribbleArea::roundZoom(Dim px, Dim py)
   if(cfg->Bool("continuousZoom"))
     return;
   Dim xborder = cfg->Float("horzBorder");
-  Dim wzoom = (getViewWidth() - 2*xborder)/currPage->width()/preScale;
-  Dim hzoom = getViewHeight()/currPage->height()/preScale;
+  // use page under center of gesture for snapping to width, height
+  int pagenum = dimToPageNum(screenToDim(Point(px, py)));
+  Dim wzoom = (getViewWidth() - 2*xborder)/page(pagenum)->width()/preScale;
+  Dim hzoom = getViewHeight()/page(pagenum)->height()/preScale;
   Dim zoom = mZoom;
   ScribbleView::roundZoom(px, py);
   // zoom = 100% always has priority
   if(mZoom == 1) {}
   else if(wzoom < 1.1*zoom && zoom < 1.1*wzoom && (wzoom > 1.05 || wzoom < 0.95)) {
+    setPageNum(pagenum);
     Point currCorner = screenToDim(Point(0, 0));
     Point pageCorner = pageDimToDim(Point(0, 0));
-    zoomTo(wzoom, px, py);
+    setZoom(wzoom);  //zoomTo(wzoom, px, py);
     setCornerPos(Point(pageCorner.x - xborder/mScale, currCorner.y));
   }
   else if(hzoom < 1.1*zoom && zoom < 1.1*hzoom && (hzoom > 1.05 || hzoom < 0.95)) {
+    // ensure that page under center of gesture is active
+    setPageNum(pagenum);
+    Point pageCenter = pageDimToDim(Point(currPage->width()/2, currPage->height()/2));
     setZoom(hzoom);
-    setCenterPos(pageDimToDim(Point(currPage->width()/2, currPage->height()/2)));
+    setCenterPos(pageCenter);
   }
 }
 

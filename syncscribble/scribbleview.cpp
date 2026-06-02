@@ -111,8 +111,9 @@ void ScribbleView::setCenterPos(Point pos)
 {
   Point screenpos = dimToScreen(pos);
   Point ul = dimToScreen(Point(-10,-10));
-  doPan(MIN(-ul.x, Dim(0.5)*getViewWidth() - screenpos.x),
-        MIN(-ul.y, Dim(0.5)*getViewHeight() - screenpos.y));
+  Dim dx = MIN(-ul.x, Dim(0.5)*getViewWidth() - screenpos.x);
+  Dim dy = MIN(-ul.y, Dim(0.5)*getViewHeight() - screenpos.y);
+  doPan(dx, dy);
 }
 
 // pan to place pos.y at top of viewport; only pan x position if necessary

@@ -69,7 +69,7 @@ StrokeBuilder* StrokeBuilder::create(const ScribblePen& pen)
 
 // builder for stroked (non-pressure sensitive) stroke
 
-StrokedStrokeBuilder::StrokedStrokeBuilder(const ScribblePen& pen) : width(pen.width)  //Color c, Dim w, Painter::CapStyle cap, Painter::JoinStyle join)
+StrokedStrokeBuilder::StrokedStrokeBuilder(const ScribblePen& pen) : width(pen.width)
 {
   SvgPath* svgPath = new SvgPath();
   stroke = svgPath->path();
@@ -251,7 +251,14 @@ void FilledStrokeBuilder::addPoint(const StrokePoint& pt)
   }
   if(pen.hasFlag(ScribblePen::WIDTH_DIR)) {
     Dim rad = pen.dirAngle * M_PI/180.0;
-    wscale *= std::abs(dot((pt2 - pt1).normalize(), Point(std::cos(rad), std::sin(rad))));  //0.5*(1.0 + dot())
+    // use point sufficient distance away to calculate angle
+    Point p = pt2;
+    Dim dtot = 0;
+    for(auto it = points.rbegin(); it != points.rend() && dtot < 2; ++it) {
+      dtot += it->dist(p);
+      p = *it;
+    }
+    wscale *= std::abs(dot((pt2 - p).normalize(), Point(std::cos(rad), std::sin(rad))));  //0.5*(1.0 + dot())
     ++nscales;
   }
   if(pen.hasFlag(ScribblePen::WIDTH_PR)) {  //pen.param1 != 0) {

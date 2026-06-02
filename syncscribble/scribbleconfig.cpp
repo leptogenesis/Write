@@ -124,6 +124,8 @@ void ScribbleConfig::init()
   cfg["docListSort"] = 0;
   // disallow browsing out of base directory
   cfg["docListSiloed"] = PLATFORM_IOS;
+  // show thumbnail in document list
+  cfg["showThumbnail"] = 1;
 
   // save thumbnail to HTML file - currently only disabled when running tests
   cfg["saveThumbnail"] = 1;

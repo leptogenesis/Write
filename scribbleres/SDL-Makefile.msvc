@@ -6,35 +6,14 @@ TARGET = SDL2.lib
 SOURCES = \
   src/*.c \
   src/atomic/*.c \
-  src/audio/*.c \
-  src/audio/directsound/*.c \
-  src/audio/disk/*.c \
-  src/audio/dummy/*.c \
-  src/audio/wasapi/*.c \
-  src/audio/winmm/*.c \
   src/core/windows/*.c \
   src/cpuinfo/*.c \
   src/events/*.c \
   src/file/*.c \
   src/filesystem/windows/*.c \
-  src/hidapi/windows/*.c \
-  src/haptic/*.c \
-  src/haptic/windows/*.c \
-  src/joystick/*.c \
-  src/joystick/hidapi/*.c \
-  src/joystick/windows/*.c \
-  src/libm/*.c \
   src/loadso/windows/*.c \
-  src/power/*.c \
-  src/power/windows/*.c \
   src/render/*.c \
-  src/render/direct3d11/*.c \
-  src/render/direct3d/*.c \
-  src/render/opengles2/*.c \
-  src/render/opengl/*.c \
   src/render/software/*.c \
-  src/sensor/*.c \
-  src/sensor/dummy/*.c \
   src/stdlib/*.c \
   src/thread/*.c \
   src/thread/generic/SDL_syscond.c \
@@ -49,7 +28,7 @@ SOURCES = \
 
 INC = ./include
 INCSYS =
-DEFS = HAVE_LIBC
+DEFS = HAVE_LIBC SDL_JOYSTICK_DISABLED SDL_HAPTIC_DISABLED SDL_SENSOR_DISABLED SDL_AUDIO_DISABLED SDL_RENDER_DISABLED
 
 RESOURCES = src/main/windows/version.rc
 
@@ -60,16 +39,16 @@ RESOURCES = src/main/windows/version.rc
 #  LIBCMT vs. MSVCRT
 CFLAGS = /MT
 # C++
-CXX = cl /nologo
+CXX = cl.exe /nologo
 CXXFLAGS = /std:c++14 /GR-
 # C
-CC = cl /nologo
+CC = cl.exe /nologo
 CCFLAGS =
 # linkerc
-LD = link /nologo /lib
+LD = lib.exe /nologo
 LDFLAGS = /SUBSYSTEM:WINDOWS
 # resource compiler
-RC = rc
+RC = rc.exe
 RCFLAGS =
 
 DEBUG ?= 0
@@ -136,7 +115,7 @@ $(OBJDIR)/%.res: %.rc
 	$(RC) $(RCFLAGS) /fo $@ $<
 
 $(TGT): $(OBJ) $(RES)
-	$(LD) /nologo /out:$@ $^ $(LDFLAGS) $(LIBS)
+	$(LD) /out:$@ $^ $(LDFLAGS) $(LIBS)
 	echo Build complete.
 
 # | (pipe) operator causes make to just check for existence instead of timestamp

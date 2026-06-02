@@ -475,6 +475,8 @@ void DocumentList::setCurrDir(const char* path)
       container->addChild(folderUseNode->clone());
     else if(!containsWord("svg svgz html htm", fileinfo.extension().c_str()))  //fileinfo.extension() != docFileExt)
       container->addChild(fileUseNode->clone());
+    else if(!ScribbleApp::cfg->Bool("showThumbnail"))
+      container->addChild(fileUseNode->clone());
     else {
       Image thumbnail = ScribbleDoc::extractThumbnail(fileinfo.c_str());
       if(!thumbnail.isNull())
