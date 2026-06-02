@@ -123,8 +123,8 @@ private void setupTouchHelper() {
         public void onEndRawErasing(boolean b, TouchPoint tp) {}
     });
 
-	updateLimitRect(); // this calls setLimitRect inside
 	touchHelper.setStrokeWidth(3.0f).openRawDrawing();
+	updateLimitRect(); // this calls setLimitRect inside
 	touchHelper.setRawDrawingRenderEnabled(true);
 	touchHelper.setPenUpRefreshTimeMs(500);
 	touchHelper.enableFingerTouch(true);  // let finger touches pass through
@@ -132,21 +132,41 @@ private void setupTouchHelper() {
 
 }
 
-
-
-private void updateLimitRect() {
+public void updateLimitRect() {
     if (touchHelper == null) return;
     int w = getWidth();
     int h = getHeight();
     if (w == 0 || h == 0) return;
+
+    int[] location = new int[2];
+    getLocationOnScreen(location);
+    int screenX = location[0];
+    int screenY = location[1];
+
+    // Get screen height
+    android.util.DisplayMetrics dm = getResources().getDisplayMetrics();
+    int screenHeight = dm.heightPixels;
+    int verticalOffset = screenHeight - h;
+
     final int TOP_BAR = 105;
     final int BOTTOM_BAR = 25;
+
+    List<Rect> limit = Collections.singletonList(
+        new Rect(0, TOP_BAR - verticalOffset, w, h - BOTTOM_BAR - verticalOffset)
+    );
+
+    android.util.Log.d("BooxOverlay", "verticalOffset=" + verticalOffset +
+        " screenY=" + screenY + " limitRect=" + limit.get(0).toString());
+
     touchHelper.setStrokeColor(android.graphics.Color.BLACK);
     touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_PENCIL);
-    List<Rect> limit = Collections.singletonList(new Rect(0, TOP_BAR, w, h - BOTTOM_BAR));
-    touchHelper.setLimitRect(limit, Collections.emptyList());
-    updatePenState();  // apply current pen state
+    touchHelper.openRawDrawing();
+    touchHelper.setStrokeWidth(3.0f).setLimitRect(limit, Collections.emptyList());
+    touchHelper.setRawDrawingRenderEnabled(true);
+    touchHelper.setRawDrawingEnabled(true);
+    updatePenState();
 }
+
 
 /*
 private void updateLimitRect() {
@@ -181,6 +201,11 @@ public void onResume() {
     }
 }
 
+@Override
+protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    getViewTreeObserver().addOnGlobalLayoutListener(() -> updateLimitRect());
+}
 public void onPause() {
     if (touchHelper != null) {
         touchHelper.setRawDrawingEnabled(false);

@@ -149,6 +149,14 @@ android.util.Log.d("WriteDebug", "nativeLibraryDir=" + getApplicationInfo().nati
 //~     }
 //~   }
 @Override
+public void onWindowFocusChanged(boolean hasFocus) {
+    super.onWindowFocusChanged(hasFocus);
+    if (hasFocus && booxOverlay != null) {
+        booxOverlay.post(() -> booxOverlay.updateLimitRect());
+    }
+}
+
+@Override
 protected void onResume() {
     super.onResume();
     if (booxOverlay != null) booxOverlay.onResume();
