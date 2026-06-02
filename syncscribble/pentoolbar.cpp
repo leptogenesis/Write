@@ -3,6 +3,7 @@
 #include "ugui/textedit.h"
 #include "touchwidgets.h"
 #include "scribbleapp.h"
+#include "android/androidhelper.h"
 
 
 // or have spinbox buttons step by 1.25x or 0.8x of current value?
@@ -520,6 +521,9 @@ void PenToolbar::updateColor()
   if(onChanged)
     onChanged(COLOR_CHANGED | (changesSinceFocused > 0 ? UNDO_PREV : 0));
   if(changesSinceFocused >= 0) ++changesSinceFocused;
+#ifdef ANDROID
+    androidUpdatePen((float)pen.width, (int)pen.color.argb(), pen.color.alphaF(), pen.usesPressure());
+#endif
 }
 
 void PenToolbar::updateWidth()
@@ -533,6 +537,9 @@ void PenToolbar::updateWidth()
   if(onChanged)
     onChanged(WIDTH_CHANGED | (changesSinceFocused > 0 ? UNDO_PREV : 0));
   if(changesSinceFocused >= 0) ++changesSinceFocused;
+#ifdef ANDROID
+    androidUpdatePen((float)pen.width, (int)pen.color.argb(), pen.color.alphaF(), pen.usesPressure());
+#endif
 }
 
 void PenToolbar::updatePen()
@@ -566,6 +573,15 @@ void PenToolbar::updatePen()
   penPreview->setPen(pen);
   if(onChanged)
     onChanged(PEN_CHANGED);
+    // Update Boox overlay with current pen state
+#ifdef ANDROID
+    androidUpdatePen(
+        (float)pen.width,
+        (int)pen.color.argb(),
+        pen.color.alphaF(),
+        pen.usesPressure()
+    );
+#endif
 }
 
 void PenToolbar::updateWidthPicker(bool varw, bool chisel)

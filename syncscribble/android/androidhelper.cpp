@@ -6,6 +6,41 @@
 #include "android/native_window_jni.h"
 #include "scribbleapp.h"
 
+
+// Pen state for Boox overlay
+static float g_penWidth = 3.0f;
+static int g_penColor = 0xFF000000; // black, ARGB format
+static float g_penAlpha = 1.0f;
+static bool g_penPressure = false;
+
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_styluslabs_writeqt_MainActivity_nativeGetPenWidth(JNIEnv* env, jclass cls) {
+    return g_penWidth;
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_styluslabs_writeqt_MainActivity_nativeGetPenColor(JNIEnv* env, jclass cls) {
+    return g_penColor;
+}
+
+extern "C" JNIEXPORT jfloat JNICALL
+Java_com_styluslabs_writeqt_MainActivity_nativeGetPenAlpha(JNIEnv* env, jclass cls) {
+    return g_penAlpha;
+}
+
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_styluslabs_writeqt_MainActivity_nativeGetPenPressure(JNIEnv* env, jclass cls) {
+    return g_penPressure;
+}
+
+// Called from C++ when pen changes
+void androidUpdatePen(float width, int argbColor, float alpha, bool pressure) {
+    g_penWidth = width;
+    g_penColor = argbColor;
+    g_penAlpha = alpha;
+    g_penPressure = pressure;
+}
+
 ScribbleApp* AndroidHelper::mainWindowInst = NULL;
 bool AndroidHelper::acceptVolKeys = false;
 static const char className[] = "com/styluslabs/writeqt/MainActivity";

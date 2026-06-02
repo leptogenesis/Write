@@ -50,6 +50,27 @@ private static final float TAP_SLOP = 10.0f; // pixels
 	onResume();
     }
 
+public void updatePenState() {
+    if (touchHelper == null) return;
+    try {
+        float width = MainActivity.nativeGetPenWidth();
+        int color = MainActivity.nativeGetPenColor();
+        float alpha = MainActivity.nativeGetPenAlpha();
+        boolean pressure = MainActivity.nativeGetPenPressure();
+
+        // Convert Write's ARGB color to Android color with alpha applied
+        int a = (int)(alpha * 255);
+        int androidColor = (color & 0x00FFFFFF) | (a << 24);
+
+        touchHelper.setStrokeWidth((float)width);
+        touchHelper.setStrokeColor(androidColor);
+        // Note: pressure sensitivity is handled by Write's renderer,
+        // Boox SDK preview uses fixed width as approximation
+    } catch (Exception e) {
+        android.util.Log.e("BooxOverlay", "updatePenState failed: " + e.getMessage());
+    }
+}
+
     public void updateSurfaceSize(float w, float h) {
         this.surfaceWidth = w;
         this.surfaceHeight = h;
@@ -59,9 +80,13 @@ private static final float TAP_SLOP = 10.0f; // pixels
 private void setupTouchHelper() {
     touchHelper = TouchHelper.create(this, 2, new RawInputCallback() {
 
-        @Override
-        public void onBeginRawDrawing(boolean b, TouchPoint tp) {}
-
+	@Override
+	public void onBeginRawDrawing(boolean b, TouchPoint tp) {
+	    strokeStartTime = System.currentTimeMillis();
+	    strokeStartX = tp.x;
+	    strokeStartY = tp.y;
+	    updatePenState();
+	}
         @Override
         public void onRawDrawingTouchPointMoveReceived(TouchPoint tp) {}
 
@@ -120,6 +145,7 @@ private void updateLimitRect() {
     touchHelper.setStrokeStyle(TouchHelper.STROKE_STYLE_PENCIL);
     List<Rect> limit = Collections.singletonList(new Rect(0, TOP_BAR, w, h - BOTTOM_BAR));
     touchHelper.setLimitRect(limit, Collections.emptyList());
+    updatePenState();  // apply current pen state
 }
 
 /*

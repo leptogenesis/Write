@@ -1,6 +1,9 @@
 #ifndef ANDROIDHELPER_H
 #define ANDROIDHELPER_H
 
+
+void androidUpdatePen(float width, int argbColor, float alpha, bool pressure);
+
 class ScribbleApp;
 
 class AndroidHelper

@@ -64,6 +64,11 @@ public class MainActivity extends SDLActivity implements View.OnTouchListener, V
   private static final int A_CLIPBOARD_SERIAL = 1006;
   private static final int A_CHECK_PERM = 1007;
 
+public static native float nativeGetPenWidth();
+public static native int nativeGetPenColor();
+public static native float nativeGetPenAlpha();
+public static native boolean nativeGetPenPressure();
+
   private ClipboardManager mClipboardMgr = null;
 
   @Override
